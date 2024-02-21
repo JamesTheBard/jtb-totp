@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -26,7 +27,12 @@ func initCommand(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	config.CreateConfigFile()
+
 	data := map[string]string{}
 	yamlData := keystore.DumpYaml(&data)
 	keystore.EncryptKeystore(config.KeystoreFile, yamlData, []byte(config.Password))
+	fmt.Println("Initialized keystore and configuration files!")
+	fmt.Printf("- Config file:   %s\n- Keystore file: %s\n", config.ConfigFile, config.KeystoreFile)
 }

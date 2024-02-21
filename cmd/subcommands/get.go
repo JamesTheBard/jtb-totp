@@ -21,7 +21,7 @@ func init() {
 }
 
 var getCmd = &cobra.Command{
-	Use:   "get",
+	Use:   "get [key name]",
 	Short: "Generate TOTP code from key",
 	Args:  cobra.ExactArgs(1),
 	Run:   getCommand,
