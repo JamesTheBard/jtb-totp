@@ -1,9 +1,14 @@
 package cmd
 
 import (
+	"log"
+	"os"
+
 	"github.com/spf13/cobra"
 
 	"jamesthebard/jtb-totp/cmd"
+	"jamesthebard/jtb-totp/config"
+	"jamesthebard/jtb-totp/keystore"
 )
 
 func init() {
@@ -13,5 +18,15 @@ func init() {
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize keystore and settings",
-	Run:   func(cmd *cobra.Command, args []string) {},
+	Run:   initCommand,
+}
+
+func initCommand(cmd *cobra.Command, args []string) {
+	err := os.MkdirAll(config.ConfigDir, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+	data := map[string]string{}
+	yamlData := keystore.DumpYaml(&data)
+	keystore.EncryptKeystore(config.KeystoreFile, yamlData, []byte(config.Password))
 }

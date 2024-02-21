@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"jamesthebard/jtb-totp/cmd"
+	"jamesthebard/jtb-totp/config"
 	"jamesthebard/jtb-totp/keystore"
 )
 
@@ -28,13 +29,12 @@ var addCmd = &cobra.Command{
 
 func addCommand(cmd *cobra.Command, args []string) {
 	data := make(map[string]string)
-	keystore.LoadEncryptedYaml("keys.yaml.enc", &data, []byte("1234"))
-	// keystore.LoadYaml("keys.yaml", &data)
+	keystore.LoadEncryptedYaml(config.KeystoreFile, &data, []byte(config.Password))
 
 	key, _ := cmd.Flags().GetString("key-name")
 	value, _ := cmd.Flags().GetString("key-value")
 
 	data[key] = value
-	yamlData := keystore.DumpYaml("keys.yaml.enc", &data)
-	keystore.EncryptKeystore("keys.yaml.enc", yamlData, []byte("1234"))
+	yamlData := keystore.DumpYaml(&data)
+	keystore.EncryptKeystore(config.KeystoreFile, yamlData, []byte(config.Password))
 }

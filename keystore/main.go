@@ -1,6 +1,7 @@
 package keystore
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -51,7 +52,7 @@ func LoadEncryptedYaml(filename string, dataMap *map[string]string, password []b
 	}
 }
 
-func DumpYaml(filename string, data *map[string]string) []byte {
+func DumpYaml(data *map[string]string) []byte {
 	yamlData := []TotpKey{}
 	for k, v := range *data {
 		yamlData = append(yamlData, TotpKey{
@@ -69,5 +70,6 @@ func EncryptKeystore(filename string, data []byte, password []byte) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	os.WriteFile(filename, encrypted.Data, 0400)
+	os.WriteFile(filename, encrypted.Data, 0600)
+	fmt.Println("Written!")
 }
