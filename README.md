@@ -91,7 +91,7 @@ Added key 'Google' to keystore successfully!
 
 ### `get` Command
 
-```console
+```
 Generate TOTP code from key
 
 Usage:
@@ -110,7 +110,7 @@ Google -> 123456
 
 ### `import` Command
 
-```console
+```
 Import keystore from YAML/JSON file
 
 Usage:
@@ -157,7 +157,7 @@ There is one flag `-o/--overwrite`.  When set, this flag will overwrite keys cur
 
 ### `init` Command
 
-```console
+```
 Initialize keystore and settings
 
 Usage:
@@ -178,7 +178,7 @@ Initialized keystore and configuration files!
 
 ### `list` Command
 
-```console
+```
 List all keys by name in keystore
 
 Usage:
