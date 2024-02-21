@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -10,6 +11,7 @@ import (
 
 var ConfigDir string
 var ConfigFile string
+var DataDir string
 var KeystoreFile string
 var Password string
 var PasswdEnvVar string
@@ -24,20 +26,33 @@ func init() {
 		log.Fatal(err)
 	}
 
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	DataDir = userHomeDir + "/.local/share/jtb-totp"
 	ConfigDir = userConfigDir + "/jtb-totp"
 	ConfigFile = ConfigDir + "/jtb-totp.conf"
-	KeystoreFile = ConfigDir + "/keystore.enc"
+	KeystoreFile = DataDir + "/keystore.enc"
 	PasswdEnvVar = "JTB_TOTP_SECRET"
 
-	f, err := os.ReadFile(ConfigFile)
-	if err != nil {
-		Password = os.Getenv(PasswdEnvVar)
-	} else {
+	var val string
+	var exists bool
+
+	if val, exists = os.LookupEnv(PasswdEnvVar); !exists {
+		f, err := os.ReadFile(ConfigFile)
+		if err != nil {
+			Password = ""
+			return
+		}
 		var data ConfigF
 		if err := yaml.Unmarshal(f, &data); err != nil {
 			log.Fatal(err)
 		}
 		Password = data.Password
+	} else {
+		Password = val
 	}
 }
 
@@ -46,6 +61,7 @@ func CreateConfigFile() {
 	var pw string
 	val, present := os.LookupEnv(PasswdEnvVar)
 	if !present {
+		fmt.Println("Not present!")
 		pw, err = password.Generate(32, 10, 0, false, false)
 		if err != nil {
 			log.Fatal(err)
@@ -66,4 +82,6 @@ func CreateConfigFile() {
 	if err := os.WriteFile(ConfigFile, yamlData, 0400); err != nil {
 		log.Fatal(err)
 	}
+
+	Password = pw
 }

@@ -28,6 +28,11 @@ func initCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
+	err = os.MkdirAll(config.DataDir, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	config.CreateConfigFile()
 
 	data := map[string]string{}

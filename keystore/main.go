@@ -67,6 +67,7 @@ func DumpYaml(data *map[string]string) []byte {
 }
 
 func EncryptKeystore(filename string, data []byte, password []byte) {
+	fmt.Println(string(data))
 	message := crypto.NewPlainMessage(data)
 	encrypted, err := crypto.EncryptMessageWithPassword(message, password)
 	if err != nil {
@@ -75,7 +76,7 @@ func EncryptKeystore(filename string, data []byte, password []byte) {
 	os.WriteFile(filename, encrypted.Data, 0600)
 }
 
-func ImportKeystore(filename string) {
+func ImportKeystore(filename string, overwrite bool) {
 	f, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -84,13 +85,13 @@ func ImportKeystore(filename string) {
 	var data []TotpKey
 
 	if err := yaml.Unmarshal(f, &data); err == nil && len(data) > 0 {
-		ProcessImportData(&f, &data)
+		ProcessImportData(&f, &data, overwrite)
 		fmt.Printf("Loaded %d keys from YAML file '%s'.\n", len(data), filename)
 		return
 	}
 
 	if err := json.Unmarshal(f, &data); err == nil && len(data) > 0 {
-		ProcessImportData(&f, &data)
+		ProcessImportData(&f, &data, overwrite)
 		fmt.Printf("Loaded %d keys from JSON file '%s'.\n", len(data), filename)
 		return
 	}
@@ -98,12 +99,18 @@ func ImportKeystore(filename string) {
 	fmt.Printf("Cannot import '%s', either the file is corrupt, ill-formatted, or there are no keys in the file!\n", filename)
 }
 
-func ProcessImportData(fileData *[]byte, data *[]TotpKey) {
-	keyMap := map[string]string{}
+func ProcessImportData(fileData *[]byte, data *[]TotpKey, overwrite bool) {
+	currentData := make(map[string]string)
+	LoadEncryptedYaml(config.KeystoreFile, &currentData, []byte(config.Password))
+
 	for _, k := range *data {
-		keyMap[k.Name] = k.Key
+		if _, ok := currentData[k.Name]; ok && !overwrite {
+			continue
+		}
+		currentData[k.Name] = k.Key
 		fmt.Printf("Imported key '%s'...\n", k.Name)
 	}
-	yamlData := DumpYaml(&keyMap)
+
+	yamlData := DumpYaml(&currentData)
 	EncryptKeystore(config.KeystoreFile, yamlData, []byte(config.Password))
 }

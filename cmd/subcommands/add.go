@@ -38,8 +38,8 @@ func addCommand(cmd *cobra.Command, args []string) {
 
 	data[key] = value
 	yamlData := keystore.DumpYaml(&data)
-	keystore.EncryptKeystore(config.KeystoreFile, yamlData, []byte(config.Password))
-	fmt.Printf("Updated keystore with new/changed data.")
 
+	keystore.EncryptKeystore(config.KeystoreFile, yamlData, []byte(config.Password))
+	fmt.Printf("Updated keystore with new/changed data.\n")
 	fmt.Printf("Added key '%s' to keystore successfully!\n", key)
 }

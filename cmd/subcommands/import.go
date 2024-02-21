@@ -12,8 +12,7 @@ import (
 func init() {
 	var Overwrite bool
 
-	importCmd.Flags().BoolVarP(&Overwrite, "overwrite", "o", false, "overwrite the current keystore (required)")
-	importCmd.MarkFlagRequired("overwrite")
+	importCmd.Flags().BoolVarP(&Overwrite, "overwrite", "o", false, "overwrite the keys in current keystore")
 
 	cmd.RootCmd.AddCommand(importCmd)
 }
@@ -26,6 +25,7 @@ var importCmd = &cobra.Command{
 }
 
 func importCommand(cmd *cobra.Command, args []string) {
-	keystore.ImportKeystore(args[0])
+	overwrite, _ := cmd.Flags().GetBool("overwrite")
+	keystore.ImportKeystore(args[0], overwrite)
 	fmt.Printf("Updated keystore with imported keys.\n")
 }
