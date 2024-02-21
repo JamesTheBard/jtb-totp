@@ -236,4 +236,21 @@ bash.org
 
 ### `remove` Command
 
-IN PROGRESS
+```
+Remove key from keystore
+
+Usage:
+  jtb-totp remove [key name] [flags]
+
+Flags:
+  -h, --help   help for remove
+```
+
+The `remove` command deletes a key from the keystore if present, or complains a bit if the key is not present.  The key name must be an exact match to the one in the keystore.
+
+```console
+$ jtb-totp remove Google
+Deleted key 'Google' from the keystore.
+$ jtb-totp remove Google
+Could not find key 'Google' in the keystore.
+```

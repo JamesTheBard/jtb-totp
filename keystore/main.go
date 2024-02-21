@@ -51,7 +51,6 @@ func DumpYaml(data *map[string]string) []byte {
 }
 
 func EncryptKeystore(filename string, data []byte, password []byte) {
-	fmt.Println(string(data))
 	message := crypto.NewPlainMessage(data)
 	encrypted, err := crypto.EncryptMessageWithPassword(message, password)
 	if err != nil {
