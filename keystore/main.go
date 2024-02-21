@@ -16,22 +16,6 @@ type TotpKey struct {
 	Key  string `yaml:"key" json:"key"`
 }
 
-// func LoadYaml(filename string, dataMap *map[string]string) {
-// 	f, err := os.ReadFile("keys.yaml")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	var data []TotpKey
-// 	if err := yaml.Unmarshal(f, &data); err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	for _, k := range data {
-// 		(*dataMap)[k.Name] = k.Key
-// 	}
-// }
-
 func LoadEncryptedYaml(filename string, dataMap *map[string]string, password []byte) {
 	f, err := os.ReadFile(filename)
 	if err != nil {
@@ -74,6 +58,28 @@ func EncryptKeystore(filename string, data []byte, password []byte) {
 		log.Fatal(err)
 	}
 	os.WriteFile(filename, encrypted.Data, 0600)
+}
+
+func ExportKeystore(filename string, stdout bool) {
+	data := map[string]string{}
+	var exists bool
+	config.Password, exists = os.LookupEnv(config.PasswdEnvVar)
+	if !exists {
+		fmt.Println("In order to export the keystore, you must explicitly set the password via environment variable!")
+		os.Exit(1)
+	}
+
+	LoadEncryptedYaml(config.KeystoreFile, &data, []byte(config.Password))
+
+	yamlData := DumpYaml(&data)
+	if stdout {
+		fmt.Println(string(yamlData))
+	} else {
+		err := os.WriteFile(filename, yamlData, 0400)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 }
 
 func ImportKeystore(filename string, overwrite bool) {

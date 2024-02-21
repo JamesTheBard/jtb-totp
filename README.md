@@ -54,6 +54,7 @@ Usage:
 
 Available Commands:
   add         Add key to keystore
+  export      Export keystore to YAML file or standard out
   get         Generate TOTP code from key
   help        Help about any command
   import      Import keystore from YAML/JSON file
@@ -73,20 +74,55 @@ Use "jtb-totp [command] --help" for more information about a command.
 Add key to keystore
 
 Usage:
-  jtb-totp add [flags]
+  jtb-totp add [key name] [key secret] [flags]
 
 Flags:
   -h, --help               help for add
-  -n, --key-name string    name of the key (required)
-  -v, --key-value string   value of the key (required)
 ```
 
 To add a key to the keystore, you can use the `add` command.  For example, to add a key named `Google` with the secret of `JBSWY3DPEHPK3PXP`, you would:
 
 ```console
-$ jtb-totp add -n Google -v JBSWY3DPEHPK3PXP
+$ jtb-totp add Google JBSWY3DPEHPK3PXP
 Updated keystore with new/changed data.
 Added key 'Google' to keystore successfully!
+```
+
+For key names with spaces, you can enclose it in quotes.
+
+```console
+$ jtb-totp add "My Little Pony" JBSWY3DPEHPK3PXP
+Updated keystore with new/changed data.
+Added key 'My Little Pony' to keystore successfully!
+```
+
+### `export` Command
+
+```
+Export keystore to YAML file or standard out
+
+Usage:
+  jtb-totp export [file to save export to] [flags]
+
+Flags:
+  -h, --help   help for export
+```
+
+This command will export the keystore into a YAML file in a convenient format that will also allow you to re-import it later if need-be.  Since this is a pretty dangerous command, it is _required_ that you supply the password via environment variable (`JTB_TOTP_SECRET`).  If a filename is supplied, the contents of the keystore will be saved to the filename.  If no arguments are supplied, the contents of the keystore will be written to standard out (`STDOUT`).
+
+```console
+$ JTB_TOTP_SECRET=mypasswordhere jtb-totp export
+- name: Google
+  key: ABCDEF
+- name: Ars Technica
+  key: QWERTY
+- name: Asta La Vista
+  key: ZXCVBN
+```
+
+```console
+$ JTB_TOTP_SECRET=mypasswordhere jtb-totp export test.yaml
+Keystore exported to 'test.yaml'.
 ```
 
 ### `get` Command
