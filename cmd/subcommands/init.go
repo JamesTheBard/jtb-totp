@@ -13,12 +13,16 @@ import (
 
 func init() {
 	var force bool
+	var initialize bool
 	var keystorePath string
 	var password string
 
-	initCmd.Flags().BoolVarP(&force, "force", "f", false, "force re-initialization of config and keystore")
+	initCmd.Flags().BoolVarP(&force, "force", "f", false, "force re-initialization (required)")
+	initCmd.Flags().BoolVarP(&initialize, "initialize", "i", false, "create new keystore/config file")
 	initCmd.Flags().StringVarP(&keystorePath, "keystore", "k", "", "location of new keystore path")
 	initCmd.Flags().StringVarP(&password, "password", "p", "", "encrypt datastore with user-defined password")
+
+	initCmd.MarkFlagRequired("initialize")
 
 	cmd.RootCmd.AddCommand(initCmd)
 }
