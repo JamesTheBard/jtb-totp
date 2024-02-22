@@ -27,6 +27,12 @@ $ cd jtb-totp
 $ go build jtb-totp.go
 ```
 
+You can also use the `Makefile` provided to build all of the relevant binaries under Linux.  The builds will be put into the `builds` directory.
+
+```console
+$ make clean && make releases
+```
+
 Again, ensure that the `jtb-totp` binary is in your user/system path so you can use it.
 
 ## Initial Setup
@@ -34,13 +40,15 @@ Again, ensure that the `jtb-totp` binary is in your user/system path so you can 
 Once everything is installed, the keystore and initial configuration files need to be created.  Simply run:
 
 ```console
-$ jtb-totp init
+$ jtb-totp init --initialize
 ```
 
-If you want to use a custom known password, you can set that up prior to the init command.  This also means that you can delete the config file so that the password is no longer on the file system.  However, you _will_ have to ensure that the `JTB_TOTP_SECRET` environment variable is set with the correct password.
+If you want to use a custom known password or put the keystore in a location of your choosing, you can do that as well.
 
 ```console
-$ JTB_TOTP_SECRET=putpasswordhere jtb-totp init
+$ jtb-totp init --initialize \
+> --keystore /path/to/keystore.enc \
+> --password thisisacoolpassword
 ```
 
 ## Commands
@@ -200,13 +208,19 @@ Usage:
   jtb-totp init [flags]
 
 Flags:
-  -h, --help   help for init
+  -f, --force             force re-initialization (required)
+  -h, --help              help for init
+  -i, --initialize        create new keystore/config file
+  -k, --keystore string   location of new keystore path
+  -p, --password string   encrypt datastore with user-defined password
 ```
 
-This command creates the initial encrypted keystore and configuration file, then outputs where they were created.  During the creation process, the program will generate a 32 character random password to encrypt the keystore with.  To override this, you can use the `JTB_TOTP_SECRET` environment variable.  Setting this prior to running the init will replace the generated password with the value of the environment variable.
+This command creates the initial encrypted keystore and configuration file, then outputs where they were created.  During the creation process, if you do not specify a password (`--password/-p`) the program will generate a 32 character random password to encrypt the keystore with.
+
+You can change where the keystore is created by using the `--keystore/-k` option.
 
 ```console
-$ jtb-totp init
+$ jtb-totp init --initialize
 Initialized keystore and configuration files!
 - Config file:   /home/jweatherly/.config/jtb-totp/jtb-totp.conf
 - Keystore file: /home/jweatherly/.local/share/jtb-totp/keystore.enc
@@ -224,14 +238,14 @@ Flags:
   -h, --help   help for list
 ```
 
-This command lists all of the keys by name that exist in the keystore.
+This command lists all of the keys by name that exist in the keystore in alphabetical order.
 
 ```console
 $ jtb-totp list
-Google
-Test Key
-Super Secret Key
 bash.org
+Google
+Super Secret Key
+Test Key
 ```
 
 ### `remove` Command
