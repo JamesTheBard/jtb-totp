@@ -17,8 +17,8 @@ func init() {
 	var keystorePath string
 	var password string
 
-	initCmd.Flags().BoolVarP(&force, "force", "f", false, "force re-initialization (required)")
-	initCmd.Flags().BoolVarP(&initialize, "initialize", "i", false, "create new keystore/config file")
+	initCmd.Flags().BoolVarP(&force, "force", "f", false, "force re-initialization")
+	initCmd.Flags().BoolVarP(&initialize, "initialize", "i", false, "create new keystore/config file (required)")
 	initCmd.Flags().StringVarP(&keystorePath, "keystore", "k", "", "location of new keystore path")
 	initCmd.Flags().StringVarP(&password, "password", "p", "", "encrypt datastore with user-defined password")
 
