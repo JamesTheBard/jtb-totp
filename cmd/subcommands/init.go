@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 
@@ -33,8 +34,9 @@ func initCommand(cmd *cobra.Command, args []string) {
 	// the program from re-initializing unless the 'force' option is given.
 	config.SetDefaults()
 	force, _ := cmd.Flags().GetBool("force")
-	if configLoaded := config.LoadConfigFile(config.ConfigFile); configLoaded && !force {
+	if configLoaded, _ := config.LoadConfigFile(config.ConfigFile); configLoaded && !force {
 		fmt.Println("The program has already been configured, you must use the --force option to re-initialize.")
+		os.Exit(1)
 	}
 
 	password, _ := cmd.Flags().GetString("password")

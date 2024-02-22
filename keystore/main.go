@@ -6,6 +6,7 @@ import (
 	"jamesthebard/jtb-totp/config"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 	"gopkg.in/yaml.v2"
@@ -109,11 +110,12 @@ func ProcessImportData(fileData *[]byte, data *[]TotpKey, overwrite bool) {
 	LoadEncryptedYaml(config.KeystoreFile, &currentData, []byte(config.Password))
 
 	for _, k := range *data {
-		if _, ok := currentData[k.Name]; ok && !overwrite {
+		name := strings.TrimSpace(k.Name)
+		if _, ok := currentData[name]; ok && !overwrite {
 			continue
 		}
-		currentData[k.Name] = k.Key
-		fmt.Printf("Imported key '%s'...\n", k.Name)
+		currentData[name] = k.Key
+		fmt.Printf("Imported key '%s'...\n", name)
 	}
 
 	yamlData := DumpYaml(&currentData)

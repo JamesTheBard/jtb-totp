@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
@@ -8,7 +10,7 @@ var RootCmd = &cobra.Command{
 	Use:   "jtb-totp",
 	Short: "JTB TOTP is makes cool numbers",
 	Long:  `JTB-TOTP is a quick-and-dirty program that generates TOTP tokens and manages TOTP keys via the command-line.`,
-	Run:   func(cmd *cobra.Command, args []string) {},
+	Run:   rootCommand,
 }
 
 func Execute() error {
@@ -21,3 +23,10 @@ func init() {
 }
 
 func initConfig() {}
+
+func rootCommand(cmd *cobra.Command, args []string) {
+	if len(args) == 0 {
+		cmd.Help()
+		os.Exit(0)
+	}
+}

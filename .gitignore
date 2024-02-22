@@ -22,3 +22,7 @@ go.work
 
 # Ignore keys
 keys.*
+
+# Ignore builds
+build/
+builds/

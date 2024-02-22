@@ -1,7 +1,7 @@
 package config
 
 import (
-	"fmt"
+	"errors"
 	"log"
 	"os"
 	"path"
@@ -29,39 +29,32 @@ type ConfigF struct {
 
 func init() {
 	SetDefaults()
-	ConfigLoaded = LoadConfigFile(ConfigFile)
+	ConfigLoaded, _ = LoadConfigFile(ConfigFile)
 }
 
-func LoadConfigFile(configFile string) bool {
+func LoadConfigFile(configFile string) (bool, error) {
 	// Load config file
 	data := ConfigF{}
 
-	configLoaded := false
-
 	f, err := os.ReadFile(configFile)
 	if err != nil {
-		fmt.Printf("Cannot open the configuration file '%s'!\n", configFile)
+		return false, errors.New("cannot open the configuration file")
 	} else {
 		err = yaml.Unmarshal(f, &data)
 		if err != nil {
-			fmt.Printf("Cannot parse the configuration file '%s'!\n", configFile)
-		} else {
-			configLoaded = true
+			return false, errors.New("cannot parse the configuration file")
 		}
 	}
 
-	// Overwrite the defaults with the values in the config file
-	if configLoaded {
-		Password = data.Password
-		KeystoreFile = data.Keystore
-	}
+	Password = data.Password
+	KeystoreFile = data.Keystore
 
 	// Override the password if given by environment variable
 	if val, exists := os.LookupEnv(PasswdEnvVar); exists && val != "" {
 		Password = val
 	}
 
-	return configLoaded
+	return true, nil
 }
 
 func SetDefaults() {
@@ -117,7 +110,7 @@ func CreateConfigFile(pass string, keystorePath string) {
 	}
 
 	// Save config file
-	if err := os.WriteFile(ConfigFile, yamlData, 0400); err != nil {
+	if err := os.WriteFile(ConfigFile, yamlData, 0600); err != nil {
 		log.Fatal(err)
 	}
 

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -25,7 +26,8 @@ func addCommand(cmd *cobra.Command, args []string) {
 	data := make(map[string]string)
 	keystore.LoadEncryptedYaml(config.KeystoreFile, &data, []byte(config.Password))
 
-	data[args[0]] = args[1]
+	key, secret := strings.TrimSpace(args[0]), strings.TrimSpace(args[1])
+	data[key] = secret
 	yamlData := keystore.DumpYaml(&data)
 
 	keystore.EncryptKeystore(config.KeystoreFile, yamlData, []byte(config.Password))
