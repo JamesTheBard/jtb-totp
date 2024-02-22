@@ -1,8 +1,0 @@
-- name: test_key_1
-  key: ABCDEF
-- name: test_key_2
-  key: QWERTY
-- name: test_key_3
-  key: ZXCVBN
-- name: test
-  key: test
