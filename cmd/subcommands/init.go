@@ -49,6 +49,9 @@ func initCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	password, _ := cmd.Flags().GetString("password")
+	keystorePath, _ := cmd.Flags().GetString("keystore")
+
 	configDir := path.Dir(config.ConfigFile)
 	err := os.MkdirAll(configDir, 0755)
 	if err != nil {
@@ -61,8 +64,6 @@ func initCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
-	password, _ := cmd.Flags().GetString("password")
-	keystorePath, _ := cmd.Flags().GetString("keystore")
 	config.CreateConfigFile(password, keystorePath)
 
 	data := map[string]string{}
