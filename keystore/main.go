@@ -6,6 +6,7 @@ import (
 	"jamesthebard/jtb-totp/config"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 	"gopkg.in/yaml.v2"
@@ -16,26 +17,28 @@ type TotpKey struct {
 	Key  string `yaml:"key" json:"key"`
 }
 
-func LoadEncryptedYaml(filename string, dataMap *map[string]string, password []byte) {
+func LoadEncryptedYaml(filename string, dataMap *map[string]string, password []byte) error {
 	f, err := os.ReadFile(filename)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	encrypted := crypto.NewPGPMessage(f)
 	decrypted, err := crypto.DecryptMessageWithPassword(encrypted, password)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	var data []TotpKey
 	if err := yaml.Unmarshal(decrypted.Data, &data); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	for _, k := range data {
 		(*dataMap)[k.Name] = k.Key
 	}
+
+	return nil
 }
 
 func DumpYaml(data *map[string]string) []byte {
@@ -106,14 +109,19 @@ func ImportKeystore(filename string, overwrite bool) {
 
 func ProcessImportData(fileData *[]byte, data *[]TotpKey, overwrite bool) {
 	currentData := make(map[string]string)
-	LoadEncryptedYaml(config.KeystoreFile, &currentData, []byte(config.Password))
+	err := LoadEncryptedYaml(config.KeystoreFile, &currentData, []byte(config.Password))
+	if err != nil {
+		fmt.Printf("Could not open/process the keystore: %s\n", err)
+		os.Exit(1)
+	}
 
 	for _, k := range *data {
-		if _, ok := currentData[k.Name]; ok && !overwrite {
+		name := strings.TrimSpace(k.Name)
+		if _, ok := currentData[name]; ok && !overwrite {
 			continue
 		}
-		currentData[k.Name] = k.Key
-		fmt.Printf("Imported key '%s'...\n", k.Name)
+		currentData[name] = k.Key
+		fmt.Printf("Imported key '%s'...\n", name)
 	}
 
 	yamlData := DumpYaml(&currentData)

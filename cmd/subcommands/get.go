@@ -29,7 +29,11 @@ var getCmd = &cobra.Command{
 
 func getCommand(cmd *cobra.Command, args []string) {
 	data := make(map[string]string)
-	keystore.LoadEncryptedYaml(config.KeystoreFile, &data, []byte(config.Password))
+	err := keystore.LoadEncryptedYaml(config.KeystoreFile, &data, []byte(config.Password))
+	if err != nil {
+		fmt.Printf("Could not open/process the keystore: %s\n", err)
+		os.Exit(1)
+	}
 
 	name, value, _ := getTotpKey(args[0], &data)
 	t := time.Now()
