@@ -116,4 +116,5 @@ func CreateConfigFile(pass string, keystorePath string) {
 
 	// Set global password for keystore creation
 	Password = pass
+	KeystoreFile = keystorePath
 }
