@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -9,7 +8,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var ConfigDir string
 var ConfigFile string
 var DataDir string
 var KeystoreFile string
@@ -17,7 +15,8 @@ var Password string
 var PasswdEnvVar string
 
 type ConfigF struct {
-	Password string `yaml:"password"`
+	Password string `yaml:"secret"`
+	Keystore string `yaml:"keystorePath,omitempty"`
 }
 
 func init() {
@@ -31,47 +30,36 @@ func init() {
 		log.Fatal(err)
 	}
 
-	DataDir = userHomeDir + "/.local/share/jtb-totp"
-	ConfigDir = userConfigDir + "/jtb-totp"
-	ConfigFile = ConfigDir + "/jtb-totp.conf"
-	KeystoreFile = DataDir + "/keystore.enc"
+	KeystoreFile = userHomeDir + "/.local/share/jtb-totp/keystore.enc"
+	ConfigFile = userConfigDir + "/jtb-totp/jtb-totp.conf"
 	PasswdEnvVar = "JTB_TOTP_SECRET"
 
-	var val string
-	var exists bool
+	f, err := os.ReadFile(ConfigFile)
+	if err == nil {
+		data := ConfigF{}
+		yaml.Unmarshal(f, &data)
 
-	if val, exists = os.LookupEnv(PasswdEnvVar); !exists {
-		f, err := os.ReadFile(ConfigFile)
-		if err != nil {
-			Password = ""
-			return
-		}
-		var data ConfigF
-		if err := yaml.Unmarshal(f, &data); err != nil {
-			log.Fatal(err)
-		}
 		Password = data.Password
-	} else {
+		KeystoreFile = data.Keystore
+	}
+
+	if val, exists := os.LookupEnv(PasswdEnvVar); exists {
 		Password = val
 	}
 }
 
-func CreateConfigFile() {
-	var err error
-	var pw string
-	val, present := os.LookupEnv(PasswdEnvVar)
-	if !present {
-		fmt.Println("Not present!")
-		pw, err = password.Generate(32, 10, 0, false, false)
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		pw = val
+func CreateConfigFile(pass string, keystorePath string) {
+	if len(pass) == 0 {
+		pass, _ = password.Generate(32, 10, 0, false, false)
+	}
+
+	if len(keystorePath) == 0 {
+		keystorePath = KeystoreFile
 	}
 
 	data := ConfigF{
-		Password: pw,
+		Password: pass,
+		Keystore: keystorePath,
 	}
 
 	yamlData, err := yaml.Marshal(data)
@@ -83,5 +71,5 @@ func CreateConfigFile() {
 		log.Fatal(err)
 	}
 
-	Password = pw
+	Password = pass
 }
