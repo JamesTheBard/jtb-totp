@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -24,7 +25,12 @@ var removeCmd = &cobra.Command{
 
 func removeCommand(cmd *cobra.Command, args []string) {
 	data := make(map[string]string)
-	keystore.LoadEncryptedYaml(config.KeystoreFile, &data, []byte(config.Password))
+	err := keystore.LoadEncryptedYaml(config.KeystoreFile, &data, []byte(config.Password))
+	if err != nil {
+		fmt.Printf("Could not open/process the keystore: %s\n", err)
+		os.Exit(1)
+	}
+
 	key := strings.TrimSpace(args[0])
 
 	_, ok := data[key]

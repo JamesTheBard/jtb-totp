@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"sort"
 
 	"github.com/spf13/cobra"
@@ -23,7 +24,11 @@ var listCmd = &cobra.Command{
 
 func listCommand(cmd *cobra.Command, args []string) {
 	data := make(map[string]string)
-	keystore.LoadEncryptedYaml(config.KeystoreFile, &data, []byte(config.Password))
+	err := keystore.LoadEncryptedYaml(config.KeystoreFile, &data, []byte(config.Password))
+	if err != nil {
+		fmt.Printf("Could not open/process the keystore: %s\n", err)
+		os.Exit(1)
+	}
 
 	keys := make([]string, 0, len(data))
 	for k := range data {
