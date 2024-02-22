@@ -2,9 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-	"os"
-	"path"
 
 	"github.com/spf13/cobra"
 
@@ -14,13 +11,13 @@ import (
 )
 
 func init() {
-	var password string
-	var keystorePath string
 	var force bool
+	var keystorePath string
+	var password string
 
-	initCmd.Flags().StringVarP(&password, "password", "p", "", "encrypt datastore with user-defined password")
-	initCmd.Flags().StringVarP(&keystorePath, "keystore", "k", "", "location of new keystore path")
 	initCmd.Flags().BoolVarP(&force, "force", "f", false, "force re-initialization of config and keystore")
+	initCmd.Flags().StringVarP(&keystorePath, "keystore", "k", "", "location of new keystore path")
+	initCmd.Flags().StringVarP(&password, "password", "p", "", "encrypt datastore with user-defined password")
 
 	cmd.RootCmd.AddCommand(initCmd)
 }
@@ -32,40 +29,21 @@ var initCmd = &cobra.Command{
 }
 
 func initCommand(cmd *cobra.Command, args []string) {
-	if force, _ := cmd.Flags().GetBool("force"); !force {
-		if _, err := os.Stat(config.ConfigFile); err == nil {
-			fmt.Println("The program has already been initialized, you must use the --force option to re-initialize.")
-			os.Exit(1)
-		}
-
-		keystoreVal, _ := cmd.Flags().GetString("keystore")
-		if len(keystoreVal) == 0 {
-			keystoreVal = config.KeystoreFile
-		}
-
-		if _, err := os.Stat(keystoreVal); err == nil {
-			fmt.Println("The program has already been initialized, you must use the --force option to re-initialize.")
-			os.Exit(1)
-		}
+	// Determine if the program has already been initialized and if it has, stop
+	// the program from re-initializing unless the 'force' option is given.
+	config.SetDefaults()
+	force, _ := cmd.Flags().GetBool("force")
+	if configLoaded := config.LoadConfigFile(config.ConfigFile); configLoaded && !force {
+		fmt.Println("The program has already been configured, you must use the --force option to re-initialize.")
 	}
 
 	password, _ := cmd.Flags().GetString("password")
 	keystorePath, _ := cmd.Flags().GetString("keystore")
 
-	configDir := path.Dir(config.ConfigFile)
-	err := os.MkdirAll(configDir, 0755)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	keystoreDir := path.Dir(config.KeystoreFile)
-	err = os.MkdirAll(keystoreDir, 0755)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	// Where those directories should be created
 	config.CreateConfigFile(password, keystorePath)
 
+	// Create a new empty encrypted keystore
 	data := map[string]string{}
 	yamlData := keystore.DumpYaml(&data)
 	keystore.EncryptKeystore(config.KeystoreFile, yamlData, []byte(config.Password))
