@@ -209,9 +209,9 @@ Usage:
   jtb-totp init [flags]
 
 Flags:
-  -f, --force             force re-initialization (required)
+  -f, --force             force re-initialization
   -h, --help              help for init
-  -i, --initialize        create new keystore/config file
+  -i, --initialize        create new keystore/config file (required)
   -k, --keystore string   location of new keystore path
   -p, --password string   encrypt datastore with user-defined password
 ```
