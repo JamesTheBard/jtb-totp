@@ -71,7 +71,8 @@ Available Commands:
   remove      Remove key from keystore
 
 Flags:
-  -h, --help   help for jtb-totp
+  -h, --help      help for jtb-totp
+  -v, --version   display the version and exit
 
 Use "jtb-totp [command] --help" for more information about a command.
 ```

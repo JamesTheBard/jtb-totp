@@ -25,7 +25,7 @@ func init() {
 
 	var versionFlag bool
 
-	RootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, "Display the version and exit")
+	RootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, "display the version and exit")
 }
 
 func initConfig() {}
