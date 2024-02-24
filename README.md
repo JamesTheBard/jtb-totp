@@ -2,35 +2,30 @@
 
 `jtb-totp` is a simple TOTP program that stores keys and secrets in a keystore and generates OTPs for use in all the places you used to use Authy for.
 
-## Supported Operating Systems
-It should support all major operating systems as it was written to be OS-agnostic.
+# Installation
 
-## Installation
+## Binaries
 
-### Binaries
-Binaries for Linux, Windows, and macOS are available for download.  Once downloaded, just put the binary into your user/system path and enjoy.  For Linux, it would look like:
+The repository has releases for the following platforms and architectures:
 
-```console
-$ mkdir -p ~/.local/bin
-$ cp jtb-totp ~/.local/bin
-$ chmod 755 ~/.local/bin/jtb-totp
-```
+- OS: `windows`, `linux`, `darwin`
+- Architectures: `amd64`, `arm64`
 
-In this example, ensure that `~/.local/bin` is in your PATH.
+To install, download the appropriate release for your OS/architecture, ensure it's in your user or system path, and enjoy!
 
-### Compilation
+## Compiling
 If you have `golang` installed, you can generate the binaries by cloning the repository and building the program.
 
 ```console
-$ git clone https://github.com/JamesTheBard/jtb-totp
-$ cd jtb-totp
-$ go build jtb-totp.go
+git clone https://github.com/JamesTheBard/jtb-totp
+cd jtb-totp
+go build
 ```
 
 You can also use the `Makefile` provided to build all of the relevant binaries under Linux.  The builds will be put into the `builds` directory.
 
 ```console
-$ make clean && make releases
+make clean && make releases
 ```
 
 Again, ensure that the `jtb-totp` binary is in your user/system path so you can use it.
@@ -40,18 +35,18 @@ Again, ensure that the `jtb-totp` binary is in your user/system path so you can 
 Once everything is installed, the keystore and initial configuration files need to be created.  Simply run:
 
 ```console
-$ jtb-totp init --initialize
+jtb-totp init --initialize
 ```
 
 If you want to use a custom known password or put the keystore in a location of your choosing, you can do that as well.
 
 ```console
-$ jtb-totp init --initialize \
-> --keystore /path/to/keystore.enc \
-> --password thisisacoolpassword
+jtb-totp init --initialize \
+    --keystore /path/to/keystore.enc \
+    --password thisisacoolpassword
 ```
 
-## Commands
+# Commands
 
 ```
 JTB-TOTP is a quick-and-dirty program that generates TOTP tokens and manages TOTP keys via the command-line.
@@ -77,7 +72,7 @@ Flags:
 Use "jtb-totp [command] --help" for more information about a command.
 ```
 
-### `add` Command
+## `add` Command
 
 ```
 Add key to keystore
@@ -92,20 +87,26 @@ Flags:
 To add a key to the keystore, you can use the `add` command.  For example, to add a key named `Google` with the secret of `JBSWY3DPEHPK3PXP`, you would:
 
 ```console
-$ jtb-totp add Google JBSWY3DPEHPK3PXP
-Updated keystore with new/changed data.
-Added key 'Google' to keystore successfully!
+jtb-totp add Google JBSWY3DPEHPK3PXP
 ```
+
+> ```
+> Updated keystore with new/changed data.
+> Added key 'Google' to keystore successfully!
+> ```
 
 For key names with spaces, you can enclose it in quotes.
 
 ```console
-$ jtb-totp add "My Little Pony" JBSWY3DPEHPK3PXP
-Updated keystore with new/changed data.
-Added key 'My Little Pony' to keystore successfully!
+jtb-totp add "My Little Pony" JBSWY3DPEHPK3PXP
 ```
 
-### `export` Command
+> ```
+> Updated keystore with new/changed data.
+> Added key 'My Little Pony' to keystore successfully!
+> ```
+
+## `export` Command
 
 ```
 Export keystore to YAML file or standard out
@@ -120,21 +121,29 @@ Flags:
 This command will export the keystore into a YAML file in a convenient format that will also allow you to re-import it later if need-be.  Since this is a pretty dangerous command, it is _required_ that you supply the password via environment variable (`JTB_TOTP_SECRET`).  If a filename is supplied, the contents of the keystore will be saved to the filename.  If no arguments are supplied, the contents of the keystore will be written to standard out (`STDOUT`).
 
 ```console
-$ JTB_TOTP_SECRET=mypasswordhere jtb-totp export
-- name: Google
-  key: ABCDEF
-- name: Ars Technica
-  key: QWERTY
-- name: Asta La Vista
-  key: ZXCVBN
+JTB_TOTP_SECRET=mypasswordhere jtb-totp export
 ```
+
+> ```yaml
+> - name: Google
+>   key: ABCDEF
+> - name: Ars Technica
+>   key: QWERTY
+> - name: Asta La Vista
+>   key: ZXCVBN
+> ```
+
+Export to filename example:
 
 ```console
-$ JTB_TOTP_SECRET=mypasswordhere jtb-totp export test.yaml
-Keystore exported to 'test.yaml'.
+JTB_TOTP_SECRET=mypasswordhere jtb-totp export test.yaml
 ```
 
-### `get` Command
+> ```
+> Keystore exported to 'test.yaml'.
+> ```
+
+## `get` Command
 
 ```
 Generate TOTP code from key
@@ -149,11 +158,14 @@ Flags:
 To generate an OTP, simply type the following command.  The `key name` argument uses fuzzy search, so it doesn't need to be exact.  It will return the best match in the keystore.
 
 ```console
-$ jtb-totp get goog
-Google -> 123456
+jtb-totp get goog
 ```
 
-### `import` Command
+> ```
+> Google -> 123456
+> ```
+
+## `import` Command
 
 ```
 Import keystore from YAML/JSON file
@@ -200,7 +212,7 @@ If provided in either format, the keys will be imported into the keystore.
 
 There is one flag `-o/--overwrite`.  When set, this flag will overwrite keys currently in the datastore with the ones in the import file.  By default, keys that already exist in the datastore will not be overwritten.
 
-### `init` Command
+## `init` Command
 
 ```
 Initialize keystore and settings
@@ -221,13 +233,16 @@ This command creates the initial encrypted keystore and configuration file, then
 You can change where the keystore is created by using the `--keystore/-k` option.
 
 ```console
-$ jtb-totp init --initialize
-Initialized keystore and configuration files!
-- Config file:   /home/jweatherly/.config/jtb-totp/jtb-totp.conf
-- Keystore file: /home/jweatherly/.local/share/jtb-totp/keystore.enc
+jtb-totp init --initialize
 ```
 
-### `list` Command
+> ```
+> Initialized keystore and configuration files!
+> - Config file:   /home/jweatherly/.config/jtb-totp/jtb-totp.conf
+> - Keystore file: /home/jweatherly/.local/share/jtb-totp/> keystore.enc
+> ```
+
+## `list` Command
 
 ```
 List all keys by name in keystore
@@ -242,14 +257,17 @@ Flags:
 This command lists all of the keys by name that exist in the keystore in alphabetical order.
 
 ```console
-$ jtb-totp list
-bash.org
-Google
-Super Secret Key
-Test Key
+jtb-totp list
 ```
 
-### `remove` Command
+> ```
+> bash.org
+> Google
+> Super Secret Key
+> Test Key
+> ```
+
+## `remove` Command
 
 ```
 Remove key from keystore
@@ -264,8 +282,17 @@ Flags:
 The `remove` command deletes a key from the keystore if present, or complains a bit if the key is not present.  The key name must be an exact match to the one in the keystore.
 
 ```console
-$ jtb-totp remove Google
-Deleted key 'Google' from the keystore.
-$ jtb-totp remove Google
-Could not find key 'Google' in the keystore.
+jtb-totp remove Google
 ```
+
+> ```
+> Deleted key 'Google' from the keystore.
+> ```
+
+```console
+jtb-totp remove Google
+```
+
+> ```
+> Could not find key 'Google' in the keystore.
+> ```
