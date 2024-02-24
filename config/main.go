@@ -10,6 +10,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Version
+var Version string
+
 // File locations
 var ConfigFile string
 var KeystoreFile string
@@ -30,6 +33,7 @@ type ConfigF struct {
 func init() {
 	SetDefaults()
 	ConfigLoaded, _ = LoadConfigFile(ConfigFile)
+	Version = "1.1.1"
 }
 
 func LoadConfigFile(configFile string) (bool, error) {

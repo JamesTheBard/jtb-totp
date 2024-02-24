@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+	"jamesthebard/jtb-totp/config"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -20,11 +22,20 @@ func Execute() error {
 func init() {
 	cobra.OnInitialize(initConfig)
 	RootCmd.CompletionOptions.HiddenDefaultCmd = true
+
+	var versionFlag bool
+
+	RootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, "Display the version and exit")
 }
 
 func initConfig() {}
 
 func rootCommand(cmd *cobra.Command, args []string) {
+	if isVersion, _ := cmd.Flags().GetBool("version"); isVersion {
+		fmt.Printf("jtb-totp %s\n", config.Version)
+		os.Exit(0)
+	}
+
 	if len(args) == 0 {
 		cmd.Help()
 		os.Exit(0)
