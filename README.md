@@ -152,17 +152,18 @@ Usage:
   jtb-totp get [key name] [flags]
 
 Flags:
-  -h, --help   help for get
+  -e, --exact   match the key name exactly
+  -h, --help    help for get
 ```
 
-To generate an OTP, simply type the following command.  The `key name` argument uses fuzzy search, so it doesn't need to be exact.  It will return the best match in the keystore.
+To generate an OTP, simply type the following command.  The `key name` argument uses fuzzy search, so it doesn't need to be exact.  It will return the best match in the keystore.  It will also show you how close it matches (e.g. its score) as well.  However, you can use the `--exact/-e` flag to skip the fuzzy matching so you can specify the exact key to use.
 
 ```console
 jtb-totp get goog
 ```
 
 > ```
-> Google -> 123456
+> [75%] Google: 123456
 > ```
 
 ## `import` Command

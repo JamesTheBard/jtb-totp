@@ -12,11 +12,14 @@ import (
 	"jamesthebard/jtb-totp/config"
 	"jamesthebard/jtb-totp/keystore"
 
-	"github.com/lithammer/fuzzysearch/fuzzy"
+	fuzzy "github.com/paul-mannino/go-fuzzywuzzy"
 	"github.com/pquerna/otp/totp"
 )
 
 func init() {
+	var exact bool
+	getCmd.Flags().BoolVarP(&exact, "exact", "e", false, "match the key name exactly")
+
 	cmd.RootCmd.AddCommand(getCmd)
 }
 
@@ -35,19 +38,30 @@ func getCommand(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	name, value, _ := getTotpKey(args[0], &data)
+	exact, _ := cmd.Flags().GetBool("exact")
+	name, value, score := getTotpKey(args[0], &data, exact)
 	t := time.Now()
 	code, err := totp.GenerateCode(value, t)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%s -> %s\n", name, code)
+	fmt.Printf("[%d%%] %s: %s\n", score, name, code)
 }
 
-func getTotpKey(search string, dataMap *map[string]string) (string, string, int) {
+func getTotpKey(search string, dataMap *map[string]string, exact bool) (string, string, int) {
+	if exact {
+		for n := range *dataMap {
+			if search == n {
+				return n, (*dataMap)[n], 100
+			}
+		}
+		fmt.Println("Could not find a key!")
+		os.Exit(1)
+	}
+
 	score, name := -1, ""
 	for n := range *dataMap {
-		if v := fuzzy.RankMatchFold(search, n); v > score {
+		if v := fuzzy.PartialRatio(search, n); v > score {
 			score = v
 			name = n
 		}
