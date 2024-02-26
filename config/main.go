@@ -33,7 +33,7 @@ type ConfigF struct {
 func init() {
 	SetDefaults()
 	ConfigLoaded, _ = LoadConfigFile(ConfigFile)
-	Version = "1.2.0"
+	Version = "1.2.1"
 }
 
 func LoadConfigFile(configFile string) (bool, error) {
