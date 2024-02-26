@@ -61,7 +61,7 @@ func getTotpKey(search string, dataMap *map[string]string, exact bool) (string, 
 
 	score, name := -1, ""
 	for n := range *dataMap {
-		if v := fuzzy.PartialRatio(search, n); v > score {
+		if v := fuzzy.Ratio(search, n); v > score {
 			score = v
 			name = n
 		}
