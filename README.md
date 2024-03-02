@@ -64,6 +64,7 @@ Available Commands:
   init        Initialize keystore and settings
   list        List all names in keystore
   remove      Remove key from keystore
+  rename      Rename key in keystore
 
 Flags:
   -h, --help      help for jtb-totp
@@ -297,3 +298,17 @@ jtb-totp remove Google
 > ```
 > Could not find key 'Google' in the keystore.
 > ```
+
+## `rename` Command
+
+```
+Rename key in keystore
+
+Usage:
+  jtb-totp rename [key name] [new name] [flags]
+
+Flags:
+  -h, --help   help for rename
+```
+
+The `rename` command renames a key in the keystore if it exists, or also complains if it does not.  The `key name` must match exactly with a key in the keystore.  The `new name` cannot be a name already in the keystore.
